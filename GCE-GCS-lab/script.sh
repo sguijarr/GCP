@@ -16,22 +16,23 @@ export DEBIAN_FRONTEND=noninteractive
 #
 # Make sure installed packages are up to date with all security patches.
 #
-apt-get -yq update
-apt-get -yq upgrade
+sudo apt-get -yq update
+sudo dpkg --configure -a
+sudo apt-get -yq upgrade
 
 
 #
 # Install Google's Stackdriver logging agent, as per
 # https://cloud.google.com/logging/docs/agent/installation
 #
-curl -sSO https://dl.google.com/cloudagents/add-logging-agent-repo.sh
+sudo curl -sSO https://dl.google.com/cloudagents/add-logging-agent-repo.sh
 sudo bash add-logging-agent-repo.sh --also-install
 
 #
 # Install and run the "stress" tool to max the CPU load for a while.
 #
-apt-get -yq install stress
-stress -c 8 -t 120
+sudo apt-get -yq install stress
+sudo stress -c 8 -t 120
 
 
 #
@@ -52,7 +53,7 @@ stress -c 8 -t 120
 # gsutil cp "${worker_log_file}" "${worker_log_bucket}"
 
 # Creo que todo lo del Report that we're done está mal y hay que hacerlo así para escribir en el bucket:
-log_bucket_metadata_name=lab-logs-bucket
+log_bucket_metadata_name=$(curl http://metadata.google.internal/computeMetadata/v1/instance/attributes/lab-logs-bucket -H "Metadata-Flavor: Google")
 worker_log_file="machine-$(hostname)-finished.txt"
 echo "Phew!  Work completed at $(date)" >"${worker_log_file}"
 echo "Copying the log file to the bucket..."
